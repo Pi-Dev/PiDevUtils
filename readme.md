@@ -3,6 +3,18 @@
 **A collection of modular, high-quality utilities for Unity development.**\
 All files are licensed under the MIT License unless otherwise specified.
 
+## 📁 Here's all of it in short
+
+> **Core** – C# extensions and general utilities  
+> **Audio** – Dynamic sound playback and audio effects  
+> **Management** – Object pooling, honeypots, singletons  
+> **Logic** – Pathfinding, timers, interpolation, distribution  
+> **Movement** – Floating objects, following targets, orientation helpers  
+> **UI** – Adaptive layouts, scaling, mobile controls  
+> **Editor** – Toolbar customization, table views, inspector tools  
+> **Helpers** – Reflection, NaN fields, dynamic inspector buttons
+
+
 ### 📦 Installation
 
 - Download or clone the repository
