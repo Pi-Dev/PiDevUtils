@@ -91,7 +91,7 @@ namespace PiDev.Utilities
             switch (frictionMode)
             {
                 case FrictionMode.RigidbodyVelocity:
-                    return rb != null ? Vector3.Scale(rb.linearVelocity, velocityMultiplier).magnitude : 0;
+                    return rb != null ? Vector3.Scale(rb.velocity, velocityMultiplier).magnitude : 0;
 
                 case FrictionMode.TransformPosition:
                     Vector3 velocity = (transform.position - lastPosition) / Time.fixedDeltaTime;
