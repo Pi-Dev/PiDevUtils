@@ -1,9 +1,15 @@
-# PiDevUtils
+## Pi-Dev Utilities
 
-**A collection of modular, high-quality utilities for Unity development.**
-**All files are licensed under the MIT License unless otherwise specified.**
+**A collection of modular, high-quality utilities for Unity development.**\
+All files are licensed under the MIT License unless otherwise specified.
 
----
+### 📦 Installation
+
+- Download or clone the repository
+- Copy the entire *Assets/PiDev* folder into your Unity project's *Assets* directory.
+- You now have full access to all utilities, components, and editor tools.
+- Some utilities depend on DoTween by Demigiant. A version of it is included in Assets/DOTween. Make sure to manually update this when necessary, its provided only for the example project to work.
+- **Unity 2021.3 LTS** or newer is recommended. *(Older versions may work but are not officially tested.)*
 
 ## 📁 Categories and Utilities
 
