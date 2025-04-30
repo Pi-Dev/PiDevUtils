@@ -135,10 +135,7 @@ Thanks for your patience and understanding!
 ---
 
 <details>
-<summary>🎵 Audio</summary>
-
-The Audio module contains ready-to-use Unity components for playing randomized sounds, spatial audio, friction/impact-based effects, and dynamic sound management. Ideal for adding immersive, responsive audio behaviors without heavy scripting.
-
+<summary>🎵 Audio - Sound banks & immersive, responsive audio behaviors without heavy scripting</summary>
 
 - **[SoundBankSet.cs](Assets/PiDev/Utilities/Audio/SoundBankSet.cs)**  
   Configurable sound bank utility for playing random spatial and 2D audio clips 
@@ -173,19 +170,8 @@ The Audio module contains ready-to-use Unity components for playing randomized s
 ---
 
 <details>
-<summary>📋 Management</summary>
-
-- **[Honeypot.cs](Assets/PiDev/Utilities/Management/Honeypot.cs)**  
-  Rudimentary security trick to catch people who mess with cheating engines and tools.
-  Don't treat this as a true security solution.
-  ```cs
-    var honeypot = new Honeypot<int>(initialValue, () => Debug.Log("Tampering detected!"));
-    honeypot.SetValue(newValue);
-    var currentValue = honeypot.GetValue();
-    honeypot.CheckForTampering();
-    honeypot.Dispose();
-  ```
-  
+<summary>📋 Management - Object pooler, Singleton<T>, Reference wrapper</summary>
+ 
 - **[ObjectPooler.cs](Assets/PiDev/Utilities/Management/ObjectPooler.cs)**  
   Yet another lightweight object pool for reusing objects efficiently.
   This one is not Unity-specific and allows full customization.
@@ -215,12 +201,23 @@ The Audio module contains ready-to-use Unity components for playing randomized s
 - **[ObjectReferences.cs](Assets/PiDev/Utilities/Management/ObjectReferences.cs)**  
   Keep strong references to assets to prevent stripping during builds.
 
+- **[Honeypot.cs](Assets/PiDev/Utilities/Management/Honeypot.cs)**  
+  Rudimentary security trick to catch people who mess with cheating engines and tools.
+  Don't treat this as a true security solution.
+  ```cs
+    var honeypot = new Honeypot<int>(initialValue, () => Debug.Log("Tampering detected!"));
+    honeypot.SetValue(newValue);
+    var currentValue = honeypot.GetValue();
+    honeypot.CheckForTampering();
+    honeypot.Dispose();
+  ```
+
 </details>
 
 ---
 
 <details>
-<summary>🧩 Helpers</summary>
+<summary>🧩 Helpers - USeful stuff for designers and programmers</summary>
 
 - **[CommentComponent.cs](Assets/PiDev/Utilities/Helpers/CommentComponent.cs)**  
   A simple component for attaching notes or comments to GameObjects in the Unity Inspector.  
@@ -248,7 +245,7 @@ The Audio module contains ready-to-use Unity components for playing randomized s
 ---
 
 <details>
-<summary>🧠 Logic</summary>
+<summary>🧠 Logic - Common and uncommon behaviors, algorithms and components</summary>
 
 - **[AStarPathfinder.cs](Assets/PiDev/Utilities/Logic/AStarPathfinder.cs)**  
   A\* pathfinding for 2D grid maps, customizable walkability.
@@ -303,7 +300,7 @@ The Audio module contains ready-to-use Unity components for playing randomized s
 
 ---
 <details>
-<summary>🏃 Movement</summary>
+<summary>🏃 Movement - Components for following targets, floating in place and other motion</summary>
 
 - **[FollowTarget.cs](Assets/PiDev/Utilities/Movement/FollowTarget.cs)**  
   Simple follow target script with Transform / Rigidbody movement modes.
@@ -338,7 +335,7 @@ The Audio module contains ready-to-use Unity components for playing randomized s
 ---
 
 <details>
-<summary>🖥️ User Interface</summary>
+<summary>🖥️ User Interface - Adaptive containers, Canvas init & Mobile joystick</summary>
 
 The UI module have some powerful yet very niche components for dynamic layout control.
 
@@ -362,6 +359,7 @@ The UI module have some powerful yet very niche components for dynamic layout co
   
 - **[CanvasInitialize.cs](Assets/PiDev/Utilities/UI/CanvasInitialize.cs)**  
   Automatic Canvas configuration for touch-only devices or specific setups.
+  This component was created to help me overcome the nonsense where canvases stay at (0,0) during edit time. With this you can make a world space canvas attached to editing camera, but still get overlay UI during runtime.
   
 - **[ImagePreferredSizeScaler.cs](Assets/PiDev/Utilities/UI/ImagePreferredSizeScaler.cs)**  
   Auto-scale Image preferred size while preserving aspect ratio.
@@ -374,7 +372,7 @@ The UI module have some powerful yet very niche components for dynamic layout co
 ---
 
 <details>
-<summary>🛠️ Editor</summary>
+<summary>🛠️ Editor - Action Toolbar and Spreadsheets for editing data</summary>
 
 - **[QuickActionToolbars.cs](Assets/PiDev/Utilities/Editor/QuickActionToolbar/QuickActionToolbars.cs)**  
    Allows adding custom action buttons to the left and right of Unity's Play, Pause, and Step buttons.
