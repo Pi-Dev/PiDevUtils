@@ -23,6 +23,15 @@ All files are licensed under the MIT License unless otherwise specified.
 - Some utilities depend on DoTween by Demigiant. A version of it is included in Assets/DOTween. Make sure to manually update this when necessary, its provided only for the example project to work.
 - **Unity 2021.3 LTS** or newer is recommended. *(Older versions may work but are not officially tested.)*
 
+### 🗒️ Note about Examples
+
+Pi-Dev Utilities is intended to include proper usage examples, but at the moment, a full sample package isn't available. Most utilities and components are straightforward to use, but I'm aware that a few — particularly the Adaptive UI tools — can feel complex or underdocumented.
+
+In the future, I plan to add sample scenes to better demonstrate these tools in action, especially the Adaptive UI components.  
+
+Thanks for your patience and understanding!
+
+
 ## 📁 Categories and Utilities
 
 ### ⚙️ Core
@@ -211,6 +220,15 @@ The Audio module contains ready-to-use Unity components for playing randomized s
 ---
 
 ### 🧩 Helpers
+
+CommentComponent.cs
+A simple MonoBehaviour for attaching notes or comments to GameObjects in the Unity Inspector.
+Useful for leaving reminders or design-time annotations directly in the scene.
+
+- **[CommentComponent.cs](Assets/PiDev/Utilities/Helpers/CommentComponent.cs)**  
+  A simple component for attaching notes or comments to GameObjects in the Unity Inspector.  
+  Useful for leaving reminders or design-time annotations in scenes/prefabs.
+  
 - **[ActionButtons.cs](Assets/PiDev/Utilities/Helpers/ActionButtons.cs)**  
   Quickly create dynamic buttons in the inspector bound to Actions.
   ```cs
