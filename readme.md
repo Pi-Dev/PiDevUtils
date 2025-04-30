@@ -217,7 +217,7 @@ Thanks for your patience and understanding!
 ---
 
 <details>
-<summary>🧩 Helpers - USeful stuff for designers and programmers</summary>
+<summary>🧩 Helpers - Useful stuff for designers and programmers</summary>
 
 - **[CommentComponent.cs](Assets/PiDev/Utilities/Helpers/CommentComponent.cs)**  
   A simple component for attaching notes or comments to GameObjects in the Unity Inspector.  
@@ -413,7 +413,7 @@ The UI module have some powerful yet very niche components for dynamic layout co
 
 All content is under the **MIT License**, unless explicitly stated otherwise in specific files.  
 Some splines/math code credits: Paul Bourke.  
-Original toolbar concept partially inspired by Bob Berkebile.
+DoTweenPath concept partially inspired by Bob Berkebile.
 
 
 ## 👤 About the Developer
