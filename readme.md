@@ -22,9 +22,8 @@ Thanks for your patience and understanding!
 
 ## 📁 Categories and Utilities
 <details>
-<summary>⚙️ Core</summary>
-
-The Core module contains mostly C# extension methods and other utils to ease development.
+<summary>⚙️ Core - mostly C# extension methods and other utils to ease development.
+</summary>
 
 - **[CollectionUtils.cs](Assets/PiDev/Utilities/Core/CollectionUtils.cs)**  
   Extension methods for safer and more convenient list, array, and collection operations.
