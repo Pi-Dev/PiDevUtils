@@ -3,18 +3,6 @@
 **A collection of modular, high-quality utilities for Unity development.**\
 All files are licensed under the MIT License unless otherwise specified.
 
-## 📁 Here's all of it in short
-
-> **Core** – C# extensions and general utilities  
-> **Audio** – Dynamic sound playback and audio effects  
-> **Management** – Object pooling, honeypots, singletons  
-> **Logic** – Pathfinding, timers, interpolation, distribution  
-> **Movement** – Floating objects, following targets, orientation helpers  
-> **UI** – Adaptive layouts, scaling, mobile controls  
-> **Editor** – Toolbar customization, table views, inspector tools  
-> **Helpers** – Reflection, NaN fields, dynamic inspector buttons
-
-
 ### 📦 Installation
 
 - Download or clone the repository
@@ -33,8 +21,8 @@ Thanks for your patience and understanding!
 
 
 ## 📁 Categories and Utilities
-
-### ⚙️ Core
+<details>
+<summary>⚙️ Core</summary>
 
 The Core module contains mostly C# extension methods and other utils to ease development.
 
@@ -47,6 +35,7 @@ The Core module contains mostly C# extension methods and other utils to ease dev
     dictionary.GetOrNull(key);
     weightedList.GetByWeight(); // ICollection<Utils.Weighted<T>>
   ```
+
 - **[FindUtils.cs](Assets/PiDev/Utilities/Core/FindUtils.cs)**  
   Fast searching utilities for finding nearest objects, random objects, or tagged objects.
   ```cs
@@ -61,11 +50,13 @@ The Core module contains mostly C# extension methods and other utils to ease dev
     Utils.GetClosestComponent(origin, allowedList);
     Utils.GetClosestObjectImplementingInterface<IMyInterface>(origin, 10f, excludeList);
   ```
+
 - **[ImporterUtils.cs](Assets/PiDev/Utilities/Core/ImporterUtils.cs)**  
   Scripts for reimporting assets and automatically applying settings like UI Sprite import mode.
   ```cs
     ImporterUtils.ImportAsUITexture("Assets/Path/To/Texture.png");
   ```
+
 - **[MathUtils.cs](Assets/PiDev/Utilities/Core/MathUtils.cs)**  
   A collection of mathematical utilities and vector extensions for common Unity tasks.
   Includes remapping, damping, snapping, rounding, component-wise vector operations,
@@ -90,6 +81,7 @@ The Core module contains mostly C# extension methods and other utils to ease dev
     if (string.ContainsAny("check", "a", "b", "c")) { ... }
     myList.Each(item => Debug.Log(item));
   ```
+
 - **[RandomUtils.cs](Assets/PiDev/Utilities/Core/RandomUtils.cs)**  
   Random selection helpers for arrays, lists, and weighted random picks.
   ```cs
@@ -138,9 +130,13 @@ The Core module contains mostly C# extension methods and other utils to ease dev
   
 - **[Interfaces.cs](Assets/PiDev/Utilities/Core/Interfaces.cs)**  
   Core interfaces for standardizing common behaviors across utilities.
+
+</details>
+
 ---
 
-### 🎵 Audio
+<details>
+<summary>🎵 Audio</summary>
 
 The Audio module contains ready-to-use Unity components for playing randomized sounds, spatial audio, friction/impact-based effects, and dynamic sound management. Ideal for adding immersive, responsive audio behaviors without heavy scripting.
 
@@ -173,10 +169,13 @@ The Audio module contains ready-to-use Unity components for playing randomized s
   
   Attach to an object with Rigidbody or implement `IVelocityAudioSourceFrictionProvider`.
   Assign `frictionSound` and `impactSound` along with velocity-based curves.
+</details>
 
 ---
 
-### 📋 Management
+<details>
+<summary>📋 Management</summary>
+
 - **[Honeypot.cs](Assets/PiDev/Utilities/Management/Honeypot.cs)**  
   Rudimentary security trick to catch people who mess with cheating engines and tools.
   Don't treat this as a true security solution.
@@ -217,13 +216,12 @@ The Audio module contains ready-to-use Unity components for playing randomized s
 - **[ObjectReferences.cs](Assets/PiDev/Utilities/Management/ObjectReferences.cs)**  
   Keep strong references to assets to prevent stripping during builds.
 
+</details>
+
 ---
 
-### 🧩 Helpers
-
-CommentComponent.cs
-A simple MonoBehaviour for attaching notes or comments to GameObjects in the Unity Inspector.
-Useful for leaving reminders or design-time annotations directly in the scene.
+<details>
+<summary>🧩 Helpers</summary>
 
 - **[CommentComponent.cs](Assets/PiDev/Utilities/Helpers/CommentComponent.cs)**  
   A simple component for attaching notes or comments to GameObjects in the Unity Inspector.  
@@ -246,9 +244,13 @@ Useful for leaving reminders or design-time annotations directly in the scene.
     [NaNField] public float optionalValue;
   ```
   Press the *NaN* button next to the field in the Inspector to set it to `float.NaN`.
+</details>
+
 ---
 
-### 🧠 Logic
+<details>
+<summary>🧠 Logic</summary>
+
 - **[AStarPathfinder.cs](Assets/PiDev/Utilities/Logic/AStarPathfinder.cs)**  
   A\* pathfinding for 2D grid maps, customizable walkability.
   ```cs
@@ -298,9 +300,11 @@ Useful for leaving reminders or design-time annotations directly in the scene.
   Use the `Update()` method manually each frame, passing `deltaTime` to progress the interpolation.
   Supports different speeds for increasing vs. decreasing values via optional `negativeSpeed` logic.
 
----
+</details>
 
-### 🏃 Movement
+---
+<details>
+<summary>🏃 Movement</summary>
 
 - **[FollowTarget.cs](Assets/PiDev/Utilities/Movement/FollowTarget.cs)**  
   Simple follow target script with Transform / Rigidbody movement modes.
@@ -330,12 +334,12 @@ Useful for leaving reminders or design-time annotations directly in the scene.
   Attach to a GameObject and configure radius, interval, and damping.\
   Optionally assign a FollowTarget to float relative to another transform.
   
-  
-
+</details>
 
 ---
 
-### 🖥️ User Interface
+<details>
+<summary>🖥️ User Interface</summary>
 
 The UI module have some powerful yet very niche components for dynamic layout control.
 
@@ -366,10 +370,12 @@ The UI module have some powerful yet very niche components for dynamic layout co
 - **[MobileUIJoystick.cs](Assets/PiDev/Utilities/UI/MobileUIJoystick.cs)**  
   Mobile-friendly on-screen joystick with flexible snapping behavior.
 
+</details>
+
 ---
 
-
-### 🛠️ Editor
+<details>
+<summary>🛠️ Editor</summary>
 
 - **[QuickActionToolbars.cs](Assets/PiDev/Utilities/Editor/QuickActionToolbar/QuickActionToolbars.cs)**  
    Allows adding custom action buttons to the left and right of Unity's Play, Pause, and Step buttons.
@@ -401,6 +407,9 @@ The UI module have some powerful yet very niche components for dynamic layout co
    /* inside OnGUI */ table.Render(myItemsArray);
   ```
   Check `ScriptableObjectTable` and `CollectionTable` for working example.
+
+</details>
+
 ---
 
 ## 📄 License
