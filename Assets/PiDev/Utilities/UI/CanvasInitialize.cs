@@ -40,6 +40,7 @@ namespace PiDev.Utilities.UI
     {
         public bool HideOnNonTouchDevices;
         public float planeDistance = 0.2f;
+        [Tooltip("Camera to use for the Canvas. If null, uses ScreenSpaceOverlay mode.")]
         public Camera targetCamera;
         private void Start()
         {
@@ -49,6 +50,10 @@ namespace PiDev.Utilities.UI
                 c.renderMode = RenderMode.ScreenSpaceCamera;
                 c.planeDistance = planeDistance;
                 c.worldCamera = targetCamera;
+            }
+            else
+            {
+                c.renderMode = RenderMode.ScreenSpaceOverlay;
             }
             if (HideOnNonTouchDevices)
             {
