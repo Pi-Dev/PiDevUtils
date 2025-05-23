@@ -1,11 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using UnityEditor;
-using UnityEditor.IMGUI.Controls;
-using UnityEngine;
-
-/* Copyright (c) 2025 Petar Petrov (PeterSvP)
+﻿/* Copyright (c) 2025 Petar Petrov (PeterSvP)
  * https://pi-dev.com * https://store.steampowered.com/pub/pidev
  * 
  * Based on SimpleEditorTableView by Red Games (https://github.com/redclock)
@@ -42,6 +35,15 @@ using UnityEngine;
  * inside OnGUI: table.Render(myItemsArray);
  */
 
+#if UNITY_EDITOR
+using UnityEditor.IMGUI.Controls;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using UnityEditor;
+using UnityEngine;
+using System.Text.RegularExpressions;
+
 
 namespace PiDev.Utilities.Editor
 {
@@ -58,7 +60,8 @@ namespace PiDev.Utilities.Editor
         private bool sortingDirty;
 
         public int SelectedRowIndex { get; private set; } = -1;
-        public T SelectedItem { get; private set; }
+        public int SelectedColumnIndex { get; private set; } = -1;
+        //public T SelectedItem { get; private set; }
 
         // Assign this action to enable drag/drop
         public Action<int, int> OnReorder;
@@ -102,7 +105,7 @@ namespace PiDev.Utilities.Editor
             }
         }
 
-        private readonly List<ColumnDefinition> columnDefsinitions = new();
+        private readonly List<ColumnDefinition> columnDefinitions = new();
 
         private T[] cachedInput;
         private T[] cachedSorted;
@@ -110,7 +113,7 @@ namespace PiDev.Utilities.Editor
 
         public void ClearColumns()
         {
-            columnDefsinitions.Clear();
+            columnDefinitions.Clear();
             columnResized = true;
         }
 
@@ -140,14 +143,14 @@ namespace PiDev.Utilities.Editor
                 currentSortIndex = (sortModes != null && sortModes.Count > 0) ? 0 : -1
             };
 
-            columnDefsinitions.Add(def);
+            columnDefinitions.Add(def);
             columnResized = true;
             return def;
         }
 
         private void Rebuild()
         {
-            columns = columnDefsinitions.Select(def => def.column).ToArray();
+            columns = columnDefinitions.Select(def => def.column).ToArray();
             multiColumnHeaderState = new MultiColumnHeaderState(columns);
             multiColumnHeader = new MultiColumnHeader(multiColumnHeaderState);
             multiColumnHeader.visibleColumnsChanged += (hdr) => hdr.ResizeToFit();
@@ -159,10 +162,10 @@ namespace PiDev.Utilities.Editor
         private void OnHeaderSortingChanged(MultiColumnHeader hdr)
         {
             int colIndex = hdr.sortedColumnIndex;
-            if (colIndex < 0 || colIndex >= columnDefsinitions.Count)
+            if (colIndex < 0 || colIndex >= columnDefinitions.Count)
                 return;
 
-            var clickedDef = columnDefsinitions[colIndex];
+            var clickedDef = columnDefinitions[colIndex];
             if (clickedDef.sortModes != null && clickedDef.sortModes.Count > 0)
             {
                 // Cycle sort index
@@ -181,76 +184,102 @@ namespace PiDev.Utilities.Editor
             }
         }
 
-        public void Render(T[] data, float maxHeight = float.MaxValue, float rowHeight = -1)
+        //bool refocus = false;
+        public void Render(T[] data, Rect rect = new Rect(), float maxHeight = float.MaxValue, float rowHeight = -1, bool inspectorMode = false)
         {
-            if (multiColumnHeader == null || columnResized) Rebuild();
 
-            // Track current selection before sorting
-            T currentlySelected = SelectedItem;
-
-            bool shouldResort = sortingDirty ||
-                                cachedSorted == null ||
-                                !ReferenceEquals(data, cachedInput);
-
-            if (shouldResort)
+            // var w = EditorWindow.focusedWindow;
+            //Debug.Log($"FW={w?.titleContent.text} && {GUI.GetNameOfFocusedControl()}");
+            try
             {
-                cachedInput = data;
-                cachedSorted = (T[])data.Clone();
-                UpdateSorting(cachedSorted);
-                sortingDirty = false;
+                if (multiColumnHeader == null || columnResized) Rebuild();
 
-                if (currentlySelected != null)
+                bool shouldResort = sortingDirty ||
+                                    cachedSorted == null ||
+                                    data.Length != cachedSorted.Length;
+
+                if (shouldResort)
                 {
-                    SelectedRowIndex = -1;
-
-                    if (currentlySelected is SerializedProperty selectedProp)
-                    {
-                        string path = selectedProp.propertyPath;
-
-                        for (int i = 0; i < cachedSorted.Length; i++)
-                        {
-                            if (cachedSorted[i] is SerializedProperty prop && prop.propertyPath == path)
-                            {
-                                SelectedRowIndex = i;
-                                SelectedItem = cachedSorted[i];
-                                break;
-                            }
-                        }
-                    }
-                    else
-                    {
-                        for (int i = 0; i < cachedSorted.Length; i++)
-                        {
-                            if (EqualityComparer<T>.Default.Equals(cachedSorted[i], currentlySelected))
-                            {
-                                SelectedRowIndex = i;
-                                SelectedItem = cachedSorted[i];
-                                break;
-                            }
-                        }
-                    }
-
-                    if (SelectedRowIndex < 0)
-                    {
-                        SelectedItem = default;
-                    }
+                    Debug.Log("TableView sorted");
+                    cachedInput = data;
+                    cachedSorted = (T[])data.Clone();
+                    UpdateSorting(cachedSorted);
+                    sortingDirty = false;
+                    GUI.FocusControl(null);
+                    GUIUtility.keyboardControl = 0; 
                 }
 
-            }
+                DrawTableGUI(cachedSorted, rect, maxHeight, rowHeight, inspectorMode);
 
-            DrawTableGUI(cachedSorted, maxHeight, rowHeight);
+            }
+            catch (ExitGUIException e) { throw e; }
+            catch (ObjectDisposedException e)
+            {
+                /* BUG: Deleting items disposes the Serialized Property */
+                // HandleUtility.Repaint();
+                Debug.LogException(e);
+            }
+            catch (Exception e)
+            {
+                Debug.LogException(e);
+            }
         }
 
         int controlId;
-        private void DrawTableGUI(T[] sortedData, float maxHeight, float rowHeight)
+        private void DrawTableGUI(T[] sortedData, Rect rect, float maxHeight, float rowHeight, bool useInspectorMode)
         {
-            float rowWidth = multiColumnHeaderState.widthOfAllVisibleColumns;
+            // Handle navigation
+            if (Event.current.rawType == EventType.KeyDown)
+            {
+                var kc = Event.current.keyCode;
+                bool editingText = EditorGUIUtility.editingTextField;
+                string focusedName = GUI.GetNameOfFocusedControl();
+                //Debug.Log($"editingText={editingText} && focusedName:{GUI.GetNameOfFocusedControl()}");
+
+                bool isMovement = kc == KeyCode.UpArrow || kc == KeyCode.DownArrow || kc == KeyCode.LeftArrow || kc == KeyCode.RightArrow;
+                bool escapeWithArrows = editingText && (kc == KeyCode.UpArrow || kc == KeyCode.DownArrow);
+                bool ignore = editingText && (kc == KeyCode.LeftArrow || kc == KeyCode.RightArrow);
+                bool isCell = TryParseCellCoordinates(focusedName, out int CellColumn, out int CellRow);
+
+                if (isMovement && !(ignore || (!escapeWithArrows && editingText)) && isCell)
+                {
+                    if (kc == KeyCode.UpArrow) CellRow--;
+                    else if (kc == KeyCode.DownArrow) CellRow++;
+                    else if (kc == KeyCode.LeftArrow) CellColumn--;
+                    else if (kc == KeyCode.RightArrow) CellColumn++;
+
+                    CellRow = Mathf.Clamp(CellRow, 0, sortedData.Length - 1);
+                    CellColumn = Mathf.Clamp(CellColumn, 0, columnDefinitions.Count - 1);
+
+                    // Do something with new x/y
+                    SelectedRowIndex = CellRow;
+                    SelectedColumnIndex = CellColumn;
+                    //SelectedItem = sortedData[CellRow];
+                    var cellName = $"TableCell[{CellColumn},{CellRow}]";
+                    GUI.FocusControl(cellName);
+                    //EditorGUI.FocusTextInControl(cellName);
+                    HandleUtility.Repaint();
+                    return;
+                }
+
+                if (kc == KeyCode.KeypadEnter || kc == KeyCode.Return)
+                {
+                    var cellName = $"TableCell[{CellColumn},{CellRow}]";
+                    GUI.FocusControl(cellName);
+                    //EditorGUI.FocusTextInControl(cellName);
+                    HandleUtility.Repaint();
+                }
+            }
+
+            float rowWidth = Mathf.Max(rect.width - 8f, multiColumnHeaderState.widthOfAllVisibleColumns);
             if (rowHeight < 0) rowHeight = EditorGUIUtility.singleLineHeight;
 
-            Rect headerRect = GUILayoutUtility.GetRect(rowWidth, rowHeight);
-            multiColumnHeader.OnGUI(headerRect, xScroll: scrollPos.x);
-
-            DrawActiveSortModeLabel();
+            if (!useInspectorMode)
+            {
+                Rect headerRect = GUILayoutUtility.GetRect(rowWidth, rowHeight);
+                multiColumnHeader.OnGUI(headerRect, xScroll: scrollPos.x);
+                DrawActiveSortModeLabel(useInspectorMode);
+            }
 
             float sumWidth = rowWidth;
             float sumHeight = rowHeight * sortedData.Length + GUI.skin.horizontalScrollbar.fixedHeight;
@@ -259,13 +288,18 @@ namespace PiDev.Utilities.Editor
             Rect viewRect = new Rect(0, 0, sumWidth, sumHeight);
 
             scrollPos = GUI.BeginScrollView(scrollViewPos, scrollPos, viewRect, false, false);
-            EditorGUILayout.BeginVertical();
+            if (useInspectorMode)
+            {
+                multiColumnHeader.OnGUI(new Rect(0, 0, rowWidth, EditorGUIUtility.singleLineHeight), 0);
+                DrawActiveSortModeLabel(useInspectorMode);
+            }
 
+            EditorGUILayout.BeginVertical();
             Rect? DrawDropRect = null;
 
             for (int row = 0; row < sortedData.Length; row++)
             {
-                Rect rowRect = new Rect(0, rowHeight * row, rowWidth, rowHeight);
+                Rect rowRect = new Rect(0, rowHeight * (row + (useInspectorMode ? 1 : 0)), rowWidth, rowHeight);
 
                 Color rowColor = row == SelectedRowIndex ? GetSelectionColor() :
                                  (row % 2 == 0 ? darkerColor : lighterColor);
@@ -274,7 +308,7 @@ namespace PiDev.Utilities.Editor
                 if (Event.current.type == EventType.MouseDown && rowRect.Contains(Event.current.mousePosition))
                 {
                     SelectedRowIndex = row;
-                    SelectedItem = sortedData[row];
+                    //SelectedItem = sortedData[row];
                 }
 
                 if (AllowRowReordering)
@@ -316,8 +350,12 @@ namespace PiDev.Utilities.Editor
                         int visibleCol = multiColumnHeader.GetVisibleColumnIndex(col);
                         Rect cellRect = multiColumnHeader.GetCellRect(visibleCol, rowRect);
                         GUI.color = row == SelectedRowIndex ? Color.Lerp(GetSelectionColor(), Color.white, 0.8f) : Color.white;
+                        GUI.SetNextControlName($"TableCell[{col},{row}]");
+                        if (Event.current.type == EventType.MouseDown && cellRect.Contains(Event.current.mousePosition))
+                            SelectedColumnIndex = col;
+
                         EditorGUI.BeginChangeCheck();
-                        columnDefsinitions[col].onDraw(cellRect, sortedData[row]);
+                        columnDefinitions[col].onDraw(cellRect, sortedData[row]);
                         if (EditorGUI.EndChangeCheck())
                         {
                             //Debug.Log($"Row {row} changed: {sortedData[row].GetType().Name}");
@@ -357,7 +395,6 @@ namespace PiDev.Utilities.Editor
                 dragFromIndex = -1;
                 Event.current.Use(); // optional, prevents propagation
             }
-
             EditorGUILayout.EndVertical();
             if (dropLineRect.HasValue)
             {
@@ -366,12 +403,12 @@ namespace PiDev.Utilities.Editor
             GUI.EndScrollView(handleScrollWheel: true);
         }
 
-        private void DrawActiveSortModeLabel()
+        private void DrawActiveSortModeLabel(bool useInspectorMode)
         {
-            if (multiColumnHeader == null || currentSortColumnIndex < 0 || currentSortColumnIndex >= columnDefsinitions.Count)
+            if (multiColumnHeader == null || currentSortColumnIndex < 0 || currentSortColumnIndex >= columnDefinitions.Count)
                 return;
 
-            var def = columnDefsinitions[currentSortColumnIndex];
+            var def = columnDefinitions[currentSortColumnIndex];
             if (def.sortModes == null || def.currentSortIndex < 0)
                 return;
 
@@ -381,7 +418,7 @@ namespace PiDev.Utilities.Editor
 
             Rect labelRect = new Rect(
                 rect.x + 4,
-                rect.y + 4 + EditorGUIUtility.singleLineHeight,
+                rect.y + 4 + (useInspectorMode ? 0 : EditorGUIUtility.singleLineHeight),
                 rect.width - 8,
                 rect.height - 4
             );
@@ -401,10 +438,10 @@ namespace PiDev.Utilities.Editor
 
         private void UpdateSorting(T[] data)
         {
-            if (currentSortColumnIndex < 0 || currentSortColumnIndex >= columnDefsinitions.Count)
+            if (currentSortColumnIndex < 0 || currentSortColumnIndex >= columnDefinitions.Count)
                 return;
 
-            var def = columnDefsinitions[currentSortColumnIndex];
+            var def = columnDefinitions[currentSortColumnIndex];
             if (def.sortModes == null || def.currentSortIndex < 0)
                 return;
 
@@ -424,6 +461,77 @@ namespace PiDev.Utilities.Editor
 #endif
         }
 
+        public static bool TryParseCellCoordinates(string input, out int col, out int row)
+        {
+            col = -1;
+            row = -1;
 
+            var match = Regex.Match(input, @"\d+\s*[:,;]\s*\d+");
+            if (!match.Success)
+                return false;
+
+            var parts = Regex.Split(match.Value, @"\s*[:,;]\s*");
+            return parts.Length == 2 &&
+                   int.TryParse(parts[0], out col) &&
+                   int.TryParse(parts[1], out row);
+        }
+
+        public static List<(string, Comparison<SerializedProperty>)> CreateSortOptionsForField(string fieldName, SerializedPropertyType propType)
+        {
+            List<(string, Comparison<SerializedProperty>)> sortModes = null;
+            switch (propType)
+            {
+                case SerializedPropertyType.Integer:
+                case SerializedPropertyType.Enum:
+                    sortModes = new()
+                        {
+                            ("▲", (a, b) => a.FindPropertyRelative(fieldName).intValue
+                                             .CompareTo(b.FindPropertyRelative(fieldName).intValue)),
+                            ("▼", (a, b) => b.FindPropertyRelative(fieldName).intValue
+                                             .CompareTo(a.FindPropertyRelative(fieldName).intValue)),
+                            ("", null)
+                        };
+                    break;
+
+                case SerializedPropertyType.Float:
+                    sortModes = new()
+                        {
+                            ("▲", (a, b) => a.FindPropertyRelative(fieldName).floatValue
+                                             .CompareTo(b.FindPropertyRelative(fieldName).floatValue)),
+                            ("▼", (a, b) => b.FindPropertyRelative(fieldName).floatValue
+                                             .CompareTo(a.FindPropertyRelative(fieldName).floatValue)),
+                            ("", null)
+                        };
+                    break;
+
+                case SerializedPropertyType.String:
+                    sortModes = new()
+                        {
+                            ("▲", (a, b) => string.Compare(
+                                a.FindPropertyRelative(fieldName).stringValue,
+                                b.FindPropertyRelative(fieldName).stringValue, StringComparison.Ordinal)),
+                            ("▼", (a, b) => string.Compare(
+                                b.FindPropertyRelative(fieldName).stringValue,
+                                a.FindPropertyRelative(fieldName).stringValue, StringComparison.Ordinal)),
+                            ("", null)
+                        };
+                    break;
+
+                case SerializedPropertyType.ObjectReference:
+                    sortModes = new()
+                        {
+                            ("▲", (a, b) => string.Compare(
+                                a.FindPropertyRelative(fieldName).objectReferenceValue?.name,
+                                b.FindPropertyRelative(fieldName).objectReferenceValue?.name, StringComparison.Ordinal)),
+                            ("▼", (a, b) => string.Compare(
+                                b.FindPropertyRelative(fieldName).objectReferenceValue?.name,
+                                a.FindPropertyRelative(fieldName).objectReferenceValue?.name, StringComparison.Ordinal)),
+                            ("", null)
+                        };
+                    break;
+            }
+            return sortModes;
+        }
     }
 }
+#endif

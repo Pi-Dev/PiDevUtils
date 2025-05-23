@@ -39,6 +39,7 @@ using System;
  * Use the built-in Create button to add new assets or reload from the asset database.
  */
 
+#if UNITY_EDITOR
 namespace PiDev.Utilities.Editor
 {
     public abstract class ScriptableObjectTable<T> : EditorWindow where T : ScriptableObject
@@ -187,7 +188,7 @@ namespace PiDev.Utilities.Editor
                             EditorGUI.PropertyField(rect, prop, GUIContent.none);
                             so.ApplyModifiedProperties();
                         }
-                    }, allowToggleVisibility: true, sortModes: sortModes);
+                    }, allowToggleVisibility: true/*, sortModes: sortModes*/);
                 }
 
                 CustomizeColumns();
@@ -278,3 +279,4 @@ namespace PiDev.Utilities.Editor
         }
     }
 }
+#endif

@@ -37,16 +37,19 @@ using UnityEngine;
  * Use GetWindow<YourDerivedCollectionTableThing>() to create and display the window.
  */
 
+#if UNITY_EDITOR
 namespace PiDev.Utilities.Editor
 {
     public abstract class CollectionTable<T> : EditorWindow
     {
-        [SerializeField] private UnityEngine.Object _boundTarget;
+        [SerializeField] protected UnityEngine.Object _boundTarget;
         [SerializeField] private string _boundPropertyPath;
 
         private SerializedObject obj;
         private SerializedProperty prop;
-        [NonSerialized] public bool ShowIndexOneBased = false;
+        [SerializeField] public bool ShowIndexOneBased = false;
+        [SerializeField] public bool ShowBindTargetObjectPicker = false;
+        [SerializeField] public bool ShowBindTargetPropertyString = false;
 
         private TableView<SerializedProperty> _tableView = new();
 
@@ -144,65 +147,15 @@ namespace PiDev.Utilities.Editor
 
                 string fieldName = iterator.name;
                 string baseLabel = ObjectNames.NicifyVariableName(fieldName);
-                List<(string, Comparison<SerializedProperty>)> sortModes = null;
+                var propType = iterator.propertyType;
+                var sortModes = TableView<T>.CreateSortOptionsForField(fieldName, propType);
 
-                switch (iterator.propertyType)
-                {
-                    case SerializedPropertyType.Integer:
-                        sortModes = new()
-                        {
-                            ("▲", (a, b) => a.FindPropertyRelative(fieldName).intValue
-                                             .CompareTo(b.FindPropertyRelative(fieldName).intValue)),
-                            ("▼", (a, b) => b.FindPropertyRelative(fieldName).intValue
-                                             .CompareTo(a.FindPropertyRelative(fieldName).intValue)),
-                            ("", null)
-                        };
-                        break;
-
-                    case SerializedPropertyType.Float:
-                        sortModes = new()
-                        {
-                            ("▲", (a, b) => a.FindPropertyRelative(fieldName).floatValue
-                                             .CompareTo(b.FindPropertyRelative(fieldName).floatValue)),
-                            ("▼", (a, b) => b.FindPropertyRelative(fieldName).floatValue
-                                             .CompareTo(a.FindPropertyRelative(fieldName).floatValue)),
-                            ("", null)
-                        };
-                        break;
-
-                    case SerializedPropertyType.String:
-                        sortModes = new()
-                        {
-                            ("▲", (a, b) => string.Compare(
-                                a.FindPropertyRelative(fieldName).stringValue,
-                                b.FindPropertyRelative(fieldName).stringValue, StringComparison.Ordinal)),
-                            ("▼", (a, b) => string.Compare(
-                                b.FindPropertyRelative(fieldName).stringValue,
-                                a.FindPropertyRelative(fieldName).stringValue, StringComparison.Ordinal)),
-                            ("", null)
-                        };
-                        break;
-
-                    case SerializedPropertyType.ObjectReference:
-                        sortModes = new()
-                        {
-                            ("▲", (a, b) => string.Compare(
-                                a.FindPropertyRelative(fieldName).objectReferenceValue?.name,
-                                b.FindPropertyRelative(fieldName).objectReferenceValue?.name, StringComparison.Ordinal)),
-                            ("▼", (a, b) => string.Compare(
-                                b.FindPropertyRelative(fieldName).objectReferenceValue?.name,
-                                a.FindPropertyRelative(fieldName).objectReferenceValue?.name, StringComparison.Ordinal)),
-                            ("", null)
-                        };
-                        break;
-                }
-
-                _tableView.AddColumn(baseLabel, 150, (rect, item) =>
+                _tableView.AddColumn(baseLabel, 50, (rect, item) =>
                 {
                     var field = item.FindPropertyRelative(fieldName);
                     if (field != null)
                         EditorGUI.PropertyField(rect, field, GUIContent.none, true);
-                }, allowToggleVisibility: true, sortModes: sortModes);
+                }, allowToggleVisibility: true, sortModes: sortModes).SetAutoResize(true);
 
 
             } while (iterator.NextVisible(false));
@@ -237,10 +190,19 @@ namespace PiDev.Utilities.Editor
 
         protected virtual void CustomizeColumns() { }
 
-        private void DrawToolbar()
-        {
-            EditorGUILayout.BeginHorizontal(EditorStyles.toolbar);
 
+        private void DrawToolbarBindTargetString()
+        {
+            if (ShowBindTargetPropertyString) _boundPropertyPath = EditorGUILayout.TextField(_boundPropertyPath);
+        }
+
+        protected virtual void DrawToolbarBindTargetPicker()
+        {
+            if (ShowBindTargetObjectPicker) _boundTarget = EditorGUILayout.ObjectField(_boundTarget, typeof(T), false);
+        }
+
+        protected virtual void ToolbarLeft()
+        {
             if (GUILayout.Button("Add Entry", EditorStyles.toolbarButton))
             {
                 prop.arraySize++;
@@ -261,12 +223,27 @@ namespace PiDev.Utilities.Editor
                 }
             }
 
-            if (GUILayout.Button("Select This", EditorStyles.toolbarButton))
-            {
-                Selection.activeObject = this;
-            }
+            if (GUILayout.Button("Select This", EditorStyles.toolbarButton)) Selection.activeObject = this;
+        }
 
+        protected virtual void ToolbarCenter()
+        {
+        }
+
+        protected virtual void ToolbarRight()
+        {
+            DrawToolbarBindTargetPicker();
+            DrawToolbarBindTargetString();
+        }
+
+        private void DrawToolbar()
+        {
+            EditorGUILayout.BeginHorizontal(EditorStyles.toolbar);
+            ToolbarLeft();
             GUILayout.FlexibleSpace();
+            ToolbarCenter();
+            GUILayout.FlexibleSpace();
+            ToolbarRight();
             EditorGUILayout.EndHorizontal();
         }
 
@@ -328,3 +305,4 @@ namespace PiDev.Utilities.Editor
         }
     }
 }
+#endif
