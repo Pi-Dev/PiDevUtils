@@ -39,7 +39,6 @@ using static PiDev.Utilities.UI.AdaptiveLayoutMode;
 
 namespace PiDev.Utilities.UI
 {
-
     [ExecuteAlways]
     public class ImagePreferredSizeScaler : MonoBehaviour, ILayoutElement
     {
