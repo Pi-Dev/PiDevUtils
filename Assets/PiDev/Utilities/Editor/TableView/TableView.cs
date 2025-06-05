@@ -185,7 +185,7 @@ namespace PiDev.Utilities.Editor
         }
 
         //bool refocus = false;
-        public void Render(T[] data, Rect rect = new Rect(), float maxHeight = float.MaxValue, float rowHeight = -1, bool inspectorMode = false)
+        public void Render(T[] data, Rect rect = new Rect(), float maxHeight = float.MaxValue, float rowHeight = -1, bool inspectorMode = false, string controlIdPrefix = "")
         {
 
             // var w = EditorWindow.focusedWindow;
@@ -206,10 +206,10 @@ namespace PiDev.Utilities.Editor
                     UpdateSorting(cachedSorted);
                     sortingDirty = false;
                     GUI.FocusControl(null);
-                    GUIUtility.keyboardControl = 0; 
+                    GUIUtility.keyboardControl = 0;
                 }
 
-                DrawTableGUI(cachedSorted, rect, maxHeight, rowHeight, inspectorMode);
+                DrawTableGUI(cachedSorted, rect, maxHeight, rowHeight, inspectorMode, controlIdPrefix);
 
             }
             catch (ExitGUIException e) { throw e; }
@@ -226,15 +226,16 @@ namespace PiDev.Utilities.Editor
         }
 
         int controlId;
-        private void DrawTableGUI(T[] sortedData, Rect rect, float maxHeight, float rowHeight, bool useInspectorMode)
+        private void DrawTableGUI(T[] sortedData, Rect rect, float maxHeight, float rowHeight, bool useInspectorMode, string controlIdPrefix)
         {
             // Handle navigation
             if (Event.current.rawType == EventType.KeyDown)
             {
+                string focusedName = GUI.GetNameOfFocusedControl();
+                if (!focusedName.StartsWith(controlIdPrefix)) return;
                 var kc = Event.current.keyCode;
                 bool editingText = EditorGUIUtility.editingTextField;
-                string focusedName = GUI.GetNameOfFocusedControl();
-                //Debug.Log($"editingText={editingText} && focusedName:{GUI.GetNameOfFocusedControl()}");
+                Debug.Log($"editingText={editingText} && focusedName:{GUI.GetNameOfFocusedControl()}");
 
                 bool isMovement = kc == KeyCode.UpArrow || kc == KeyCode.DownArrow || kc == KeyCode.LeftArrow || kc == KeyCode.RightArrow;
                 bool escapeWithArrows = editingText && (kc == KeyCode.UpArrow || kc == KeyCode.DownArrow);
@@ -255,7 +256,7 @@ namespace PiDev.Utilities.Editor
                     SelectedRowIndex = CellRow;
                     SelectedColumnIndex = CellColumn;
                     //SelectedItem = sortedData[CellRow];
-                    var cellName = $"TableCell[{CellColumn},{CellRow}]";
+                    var cellName = $"{controlIdPrefix}TableCell[{CellColumn},{CellRow}]";
                     GUI.FocusControl(cellName);
                     //EditorGUI.FocusTextInControl(cellName);
                     HandleUtility.Repaint();
@@ -264,7 +265,7 @@ namespace PiDev.Utilities.Editor
 
                 if (kc == KeyCode.KeypadEnter || kc == KeyCode.Return)
                 {
-                    var cellName = $"TableCell[{CellColumn},{CellRow}]";
+                    var cellName = $"{controlIdPrefix}TableCell[{CellColumn},{CellRow}]";
                     GUI.FocusControl(cellName);
                     //EditorGUI.FocusTextInControl(cellName);
                     HandleUtility.Repaint();
@@ -350,7 +351,7 @@ namespace PiDev.Utilities.Editor
                         int visibleCol = multiColumnHeader.GetVisibleColumnIndex(col);
                         Rect cellRect = multiColumnHeader.GetCellRect(visibleCol, rowRect);
                         GUI.color = row == SelectedRowIndex ? Color.Lerp(GetSelectionColor(), Color.white, 0.8f) : Color.white;
-                        GUI.SetNextControlName($"TableCell[{col},{row}]");
+                        GUI.SetNextControlName($"{controlIdPrefix}TableCell[{col},{row}]");
                         if (Event.current.type == EventType.MouseDown && cellRect.Contains(Event.current.mousePosition))
                             SelectedColumnIndex = col;
 

@@ -65,7 +65,7 @@ public class InspectorTable : PropertyDrawer
                 for (int i = 0; i < count; i++) rows[i] = itemsProp.GetArrayElementAtIndex(i);
 
                 float height = itemsProp.arraySize * EditorGUIUtility.singleLineHeight + 32;
-                tableView.Render(rows, position, height, inspectorMode: true);
+                tableView.Render(rows, position, height, inspectorMode: true, controlIdPrefix: property.propertyPath);
             }
 
         }
