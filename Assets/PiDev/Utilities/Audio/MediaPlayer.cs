@@ -7,8 +7,13 @@ using UnityEngine.XR;
 
 namespace PiDev.Utilities
 {
-    public class MediaPlayer : GlobalSingleton<MediaPlayer>
+    public class MediaPlayer : Singleton<MediaPlayer>
     {
+        // === Subclass can override these ===
+        protected override bool UseDontDestroyOnLoad => true;
+        protected override bool AutoCreateIfMissing => true;
+        protected override InstanceBehavior InstanceManagementMode => InstanceBehavior.KeepExistingDestroyNew;
+
         [Serializable]
         public class MusicTrack
         {
@@ -119,7 +124,7 @@ namespace PiDev.Utilities
         /// </summary>
         public static void StopAll(float fadeTime = float.NaN, bool removeTracks = true)
         {
-            foreach (var t in Instance.tracks)
+            foreach (var t in instance.tracks)
             {
                 if (!float.IsNaN(fadeTime)) t.fadeTime = fadeTime;
                 t.weight = -1;
@@ -136,7 +141,7 @@ namespace PiDev.Utilities
         /// <param name="fadeTime"></param>
         public static void StopWithName(string name, float fadeTime = float.NaN, bool removeTracks = true)
         {
-            foreach (var t in Instance.tracks)
+            foreach (var t in instance.tracks)
                 if (t.name == name)
                 {
                     if (!float.IsNaN(fadeTime)) t.fadeTime = fadeTime;
@@ -203,23 +208,23 @@ namespace PiDev.Utilities
 
         public static MusicTrack Get(AudioClip clip, bool createIfNotExists = false, AudioClip mixableClip = null)
         {
-            var mt = Instance.tracks.Where(t => t.source.clip == clip).FirstOrDefault();
+            var mt = instance.tracks.Where(t => t.source.clip == clip).FirstOrDefault();
             if (mt == null && createIfNotExists)
             {
                 mt = new MusicTrack();
 
-                mt.source = Instance.gameObject.AddComponent<AudioSource>();
+                mt.source = instance.gameObject.AddComponent<AudioSource>();
                 mt.source.volume = 0;
-                mt.source.outputAudioMixerGroup = Instance.mixerGroupMusic;
+                mt.source.outputAudioMixerGroup = instance.mixerGroupMusic;
                 mt.source.clip = clip;
                 mt.source.bypassReverbZones = true;
                 mt.source.priority = 0;
 
                 if (mixableClip != null)
                 {
-                    mt.mixableSource = Instance.gameObject.AddComponent<AudioSource>();
+                    mt.mixableSource = instance.gameObject.AddComponent<AudioSource>();
                     mt.mixableSource.volume = 0;
-                    mt.mixableSource.outputAudioMixerGroup = Instance.mixerGroupMusic;
+                    mt.mixableSource.outputAudioMixerGroup = instance.mixerGroupMusic;
                     mt.mixableSource.clip = mixableClip;
                     mt.mixableSource.bypassReverbZones = true;
                     mt.mixableSource.priority = 0;
@@ -228,7 +233,7 @@ namespace PiDev.Utilities
                 var dst = AudioSettings.dspTime;
                 mt.source.PlayScheduled(dst + 0.3f);
                 mt.mixableSource?.PlayScheduled(dst + 0.3f);
-                Instance.tracks.Add(mt);
+                instance.tracks.Add(mt);
             }
             return mt;
         }
@@ -238,7 +243,7 @@ namespace PiDev.Utilities
         /// </summary>
         public static MusicTrack PlaySolo(AudioClip clip, float volume, float fadeTime, float delayTime = 0, bool loop = true, bool stopAllOtherTracks = false, string name = "")
         {
-            foreach (var t in Instance.tracks)
+            foreach (var t in instance.tracks)
             {
                 t.weight = 0;
                 t.targetVolume = 0;
@@ -252,7 +257,7 @@ namespace PiDev.Utilities
 
         public static MusicTrack PlaySoloLayered(AudioClip background, AudioClip foreground, float volume, float fadeTime, float delayTime = 0, bool loop = true, bool stopAllOtherTracks = false)
         {
-            foreach (var t in Instance.tracks)
+            foreach (var t in instance.tracks)
             {
                 t.weight = 0;
                 if (stopAllOtherTracks) t.removeIfSilent = true;
@@ -260,15 +265,6 @@ namespace PiDev.Utilities
             var mt = PlayLayered(background, foreground, 1, volume, fadeTime, loop);
             mt.delay = delayTime;
             return mt;
-        }
-
-        public static void ShutDown()
-        {
-            if (_instance != null)
-            {
-                Destroy(_instance.gameObject);
-                _instance = null;
-            }
         }
     }
 }

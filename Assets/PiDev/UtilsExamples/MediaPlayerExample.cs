@@ -33,7 +33,7 @@ public class MediaPlayerExample : MonoBehaviour
 
     private void Start()
     {
-        MediaPlayer.Instance.foregroundVolume = GameObject.Find("ResponsiveSlider").GetComponent<Slider>().value; // this will init the singleton
+        MediaPlayer.instance.foregroundVolume = GameObject.Find("ResponsiveSlider").GetComponent<Slider>().value; // this will init the singleton
     }
 
     void PlayMainMusic(AudioClip music, float volume)
@@ -86,7 +86,7 @@ public class MediaPlayerExample : MonoBehaviour
         mt.targetVolume = 1;
     }
 
-    public void SetForegroundVolume(float volume) => MediaPlayer.Instance.foregroundVolume = volume;
+    public void SetForegroundVolume(float volume) => MediaPlayer.instance.foregroundVolume = volume;
 
     // Blend Tracks example
     MediaPlayer.MusicTrack track1;
@@ -106,6 +106,14 @@ public class MediaPlayerExample : MonoBehaviour
         if (track1 != null) track1.targetVolume = weight1.Evaluate(factor);
         if (track2 != null) track2.targetVolume = weight2.Evaluate(factor);
         if (track3 != null) track3.targetVolume = weight3.Evaluate(factor);
+    }
+
+    public void ExitApplication()
+    {
+        Application.Quit();
+#if UNITY_EDITOR
+        UnityEditor.EditorApplication.isPlaying = false; 
+#endif
     }
 
     // Shut up!

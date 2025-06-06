@@ -99,7 +99,7 @@ namespace PiDev.Utilities
         public ActionButton[] GetButtons() => buttons.ToArray();
     }
 
-
+#if UNITY_EDITOR
     [CustomPropertyDrawer(typeof(ActionButtons))]
     public class ActionButtonsDrawer : PropertyDrawer
     {
@@ -145,4 +145,5 @@ namespace PiDev.Utilities
             return EditorGUIUtility.singleLineHeight;
         }
     }
+#endif
 }

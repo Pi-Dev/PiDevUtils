@@ -36,6 +36,7 @@ using System.IO;
 
 public static class ImporterUtils
 {
+#if UNITY_EDITOR
     public static void ImportAsUITexture(string relativePath)
     {
         // Import the texture as a Texture2D
@@ -53,4 +54,5 @@ public static class ImporterUtils
             importer.SaveAndReimport(); 
         }
     }
+#endif
 }

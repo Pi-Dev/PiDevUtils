@@ -1,6 +1,7 @@
+using UnityEngine;
 #if UNITY_EDITOR
 using UnityEditor;
-using UnityEngine;
+#endif
 
 /* Copyright (c) 2025 Petar Petrov (PeterSvP)
  * https://pi-dev.com * https://store.steampowered.com/pub/pidev
@@ -38,6 +39,7 @@ namespace PiDev.Utilities
 {
     public sealed class NaNField : PropertyAttribute { }
 
+#if UNITY_EDITOR
     [CustomPropertyDrawer(typeof(NaNField))]
     public sealed class NaNFloatField : PropertyDrawer
     {
@@ -55,5 +57,5 @@ namespace PiDev.Utilities
             if (GUI.Button(buttonpos, "NaN")) property.floatValue = float.NaN;
         }
     }
-}
 #endif
+}

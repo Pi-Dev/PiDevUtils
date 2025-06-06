@@ -16,13 +16,13 @@ namespace PiDev.Utilities
 
         void Update()
         {
-            if (!MediaPlayer.HasInstance)
+            if (MediaPlayer.instance == null)
             {
                 text.text = "<b>MediaPlayer</b> Not Available";
                 return;
             }
 
-            if (mp == null) mp = MediaPlayer.Instance;
+            if (mp == null) mp = MediaPlayer.instance;
             string s = "";
             foreach (var track in mp.tracks)
                 if (track != null) s += track.ToString() + "\n";
