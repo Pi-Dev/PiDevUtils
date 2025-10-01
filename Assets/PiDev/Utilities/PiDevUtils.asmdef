@@ -1,3 +1,20 @@
 {
-	"name": "PiDevUtils"
+    "name": "PiDevUtils",
+    "rootNamespace": "",
+    "references": [],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [
+        {
+            "name": "Unity",
+            "expression": "",
+            "define": "PI_DEV_UTILS"
+        }
+    ],
+    "noEngineReferences": false
 }

@@ -17,7 +17,6 @@ namespace PiDev.Utilities
 {
     public class ObjectReferences : MonoBehaviour
     {
-
         public Object[] references;
     }
 }

@@ -6,6 +6,9 @@ using System.Collections.Generic;
 using static PiDev.Utils;
 using System;
 
+// This class is INCOMPLETE. DO NOT USE IT!
+// it has ANNOYING SIDE EFFECTS
+
 [CustomPropertyDrawer(typeof(SerializableDictionary<,>), true)]
 public class SerializableDictionaryDrawer : PropertyDrawer
 {

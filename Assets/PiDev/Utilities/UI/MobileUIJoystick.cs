@@ -97,14 +97,5 @@ namespace PiDev.Utilities
         }
 
         public bool IsDragging() => isDragging;
-
-        //private void Update()
-        //{
-        //    if (isDragging)
-        //    {
-        //        // Continuously update the knob position based on touch movement
-        //        // This may be empty if all the movement logic is handled in OnDrag
-        //    }
-        //}
     }
 }

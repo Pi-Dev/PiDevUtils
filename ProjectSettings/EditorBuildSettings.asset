@@ -4,5 +4,8 @@
 EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
-  m_Scenes: []
+  m_Scenes:
+  - enabled: 1
+    path: Assets/PiDev/UtilsExamples/SoundFlowExample.unity
+    guid: 9c5bb982a32ef884a922db86ff3b8093
   m_configObjects: {}

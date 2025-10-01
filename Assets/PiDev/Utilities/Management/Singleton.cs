@@ -13,7 +13,6 @@ using UnityEngine;
  * public class MyManager : Singleton<MyManager> { }
  * Access the singleton with MyManager.instance.
  */
-using UnityEngine;
 
 namespace PiDev.Utilities
 {
@@ -34,6 +33,8 @@ namespace PiDev.Utilities
         {
             get
             {
+                if (Application.isEditor && !Application.isPlaying && _isShuttingDown) _isShuttingDown = false; // Reset shutdown state in editor mode
+
                 if (_isShuttingDown)
                 {
                     Debug.LogWarning($"[Singleton] Instance of {typeof(T)} is already destroyed.");
@@ -99,12 +100,6 @@ namespace PiDev.Utilities
         }
 
         protected virtual void OnApplicationQuit() => _isShuttingDown = true;
-
-        protected virtual void OnDestroy()
-        {
-            if (_instance == this)
-                _isShuttingDown = true;
-        }
 
         protected virtual void OnInitialize() { }
 

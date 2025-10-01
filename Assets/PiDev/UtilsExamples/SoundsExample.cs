@@ -7,7 +7,7 @@ using UnityEngine;
 /* Copyright (c) 2025 Petar Petrov (PeterSvP)
  * Provided for Reference & example usage
  * 
- * Part of ColorBlind FX: Desaturation, which you can purchase here: 
+ * Part of ColorBlend FX: Desaturation, which you can purchase here: 
  * https://store.steampowered.com/app/670510/ColorBlend_FX_Desaturation/
  * 
  * ============= Description =============

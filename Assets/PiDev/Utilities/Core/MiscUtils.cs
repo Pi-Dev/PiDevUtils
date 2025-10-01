@@ -90,7 +90,7 @@ namespace PiDev
             return playableGraph;
         }
 
-        public static int hash32i(string source)
+        public static int Hash32i(string source)
         {
             const int MULTIPLIER = 36;
             int h = 0;
