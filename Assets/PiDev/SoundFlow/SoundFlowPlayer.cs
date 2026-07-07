@@ -25,29 +25,12 @@ using UnityEngine.Audio;
 
 namespace PiDev.SoundFlow
 {
-    // SoundFlow can be used as a stand-alone - in which case it must be added to the scene manually,
-    // by using very stupid rudeiemntary Singleton logic that will acts like InstanceBehavior.AllowDuplicatesOverrideOldInstance
-#if !PI_DEV_UTILS
-    public class Singleton<T> : MonoBehaviour where T : MonoBehaviour
-    {
-        public static T instance;
-        protected virtual void Awake() => instance = this as T;
-    }
-#endif
-
     /// <summary>
     /// SoundFlow: modern, explicit audio runtime. Global weight/duck/mute logic with per-track UpdateFlowTrack control.
     /// This player can be used as a Singleton, but does not lazy-create itself. Place it in the scene.
     /// </summary>
     public class SoundFlowPlayer : Singleton<SoundFlowPlayer>
     {
-        // If you get compile error here and Pi-Dev Utils is no longer used, remove the PI_DEV_UTILS define from the project settings.
-#if PI_DEV_UTILS // Pi-Dev Utils Singleton is much more feature-packed
-        protected override InstanceBehavior InstanceManagementMode => InstanceBehavior.AllowDuplicatesDontOverrideOldInstance;
-        protected override bool AutoCreateIfMissing => true;
-        protected override bool UseDontDestroyOnLoad => false;
-#endif
-
         public AudioMixerGroup mixerGroup;
 
         [SerializeField] public List<FlowTrackBase> _tracks = new List<FlowTrackBase>(64);
@@ -82,6 +65,7 @@ namespace PiDev.SoundFlow
                         b.loop = loop;
                         b.pitch = pitch;
                         b.state.scheduledDsp = dspTime ?? float.NaN;
+                        //b.state.currentVolume = 0f; // will ramp in
                         b.settings.targetVolume = 0f;
                         b.volumeScale = volumeScale;
                         b.settings.weight = weight;
@@ -104,6 +88,7 @@ namespace PiDev.SoundFlow
             track.pitch = pitch;
             track.state.scheduledDsp = dspTime ?? float.NaN;
             track.state.currentVolume = 0f; // will ramp in
+            track.state.removeIfSilent = false;
             track.settings.targetVolume = 0f;
             track.volumeScale = volumeScale;
             track.settings.weight = weight;
@@ -122,6 +107,7 @@ namespace PiDev.SoundFlow
             if (!_tracks.Contains(track)) Register(track);
             track.state.scheduledDsp = dspTime ?? float.NaN;
             track.state.isPlaying = true;
+            track.state.removeIfSilent = false;
             track.settings.weight = weight;
             SafeInvoke(() => track.OnPlay(this), track);
             return track;
@@ -171,7 +157,7 @@ namespace PiDev.SoundFlow
             StopFadeToZero(track, finalFade, unload);
         }
 
-        void StopFadeToZero(FlowTrackBase track, float fadeTime, bool unload)
+        public void StopFadeToZero(FlowTrackBase track, float fadeTime, bool unload)
         {
             if (track == null) return;
             track.settings.exclusiveMode = false;

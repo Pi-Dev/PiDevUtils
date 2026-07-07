@@ -64,7 +64,10 @@ namespace PiDev.SoundFlow
             foreach (var stem in stems)
             {
                 if (stem == null) continue;
+
+                stem.currentVolume = 0f;
                 stem.targetVolume = 0f;
+
                 if (stem.clip == null)
                 {
                     if (stem.source != null) Destroy(stem.source);
