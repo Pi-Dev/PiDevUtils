@@ -81,17 +81,17 @@ namespace PiDev.Utilities
 
         public AudioSource Play(Vector3 position, float volumeScale = 1, float overrideSpatial = float.NaN, float delay = 0)
         {
-            return PlaySFXAtPoint(Get(), volume * volumeScale, position, null, float.IsNaN(overrideSpatial) ? spatialBlend : overrideSpatial, mainRadius, falloffRadius, pitchRandomize, delay);
+            return PlaySFXAtPoint(Get(), volume * volumeScale, position, mixerGroup, float.IsNaN(overrideSpatial) ? spatialBlend : overrideSpatial, mainRadius, falloffRadius, pitchRandomize, delay);
         }
 
         public AudioSource PlayLooping(Vector3 position, float volumeScale = 1)
         {
-            return LoopSFXAtPoint(Get(), volume * volumeScale, position, null, spatialBlend, mainRadius, falloffRadius, pitchRandomize);
+            return LoopSFXAtPoint(Get(), volume * volumeScale, position, mixerGroup, spatialBlend, mainRadius, falloffRadius, pitchRandomize);
         }
 
         public AudioSource PlayLooping(Transform followTarget, float volumeScale = 1)
         {
-            var sfx = LoopSFXAtPoint(Get(), volume * volumeScale, followTarget.position, null, spatialBlend, mainRadius, falloffRadius, pitchRandomize);
+            var sfx = LoopSFXAtPoint(Get(), volume * volumeScale, followTarget.position, mixerGroup, spatialBlend, mainRadius, falloffRadius, pitchRandomize);
             var ft = sfx.gameObject.AddComponent<FollowTarget>();
             ft.target = followTarget;
             ft.offset = Vector3.zero;
@@ -100,7 +100,7 @@ namespace PiDev.Utilities
 
         public AudioSource Play2D(float volumeScale = 1, bool usePitchRandimization = false, float delay = 0, int index = -1)
         {
-            return PlaySFXAtPoint(Get(-1, index), volume * volumeScale, Vector3.zero, null, 0, 10000, 10000, usePitchRandimization ? pitchRandomize : 0, delay);
+            return PlaySFXAtPoint(Get(-1, index), volume * volumeScale, Vector3.zero, mixerGroup, 0, 10000, 10000, usePitchRandimization ? pitchRandomize : 0, delay);
         }
 
         public static AudioSource PlaySFXAtPoint(AudioClip clip, float volume, Vector3 position, AudioMixerGroup group, float spatial = 1, float mainRadius = 5, float falloffRadius = 10, float pitchRandomize = 0, float delay = 0)
